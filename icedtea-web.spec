@@ -38,6 +38,7 @@ BuildRequires:	gtk2-devel
 BuildRequires:	java-1.6.0-openjdk-devel >= 1.6.0.0-18.b22
 
 BuildRequires:	xulrunner-devel
+BuildRequires:	zip
 BuildRequires:	zlib-devel
 
 Requires:	java-1.6.0-openjdk
