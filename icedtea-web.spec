@@ -50,9 +50,6 @@ Provides:	java-plugin = %{javaver}
 Provides:	java-1.6.0-openjdk-plugin = 1.6.0.0-18.b22
 Obsoletes:	java-1.6.0-openjdk-plugin < 1.6.0.0-18.b20
 
-# IcedTea is only built on these archs for now
-ExclusiveArch: x86_64 i686
-
 Patch0:		icedtea-web-1.0.2-mutex_and_leak.patch
 
 %description
@@ -99,7 +96,7 @@ desktop-file-install --vendor '' \
 desktop-file-install --vendor '' \
 	--dir %{buildroot}%{_datadir}/applications itweb-settings.desktop
 
-%post
+%posttrans
 update-alternatives --remove %{javaplugin}				\
   %{javadir}/jre/lib/%{archinstall}/gcjwebplugin.so 2>/dev/null
 update-alternatives --remove %{javaplugin}				\
