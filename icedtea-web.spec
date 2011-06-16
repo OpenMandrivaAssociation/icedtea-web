@@ -1,3 +1,10 @@
+%if %mandriva_branch == Cooker
+%define release		%mkrel 2
+%else
+%define subrel		1
+%define release		%mkrel 0
+%endif
+
 # Version of java
 %define javaver		1.6.0
 
@@ -23,7 +30,7 @@
 
 Name:		icedtea-web
 Version:	1.0.2
-Release:	1
+Release:	%{release}
 Summary:	Additional Java components for OpenJDK
 Group:		Networking/WWW
 License:	LGPLv2+ and GPLv2 with exceptions
@@ -49,7 +56,7 @@ Requires(postun): update-alternatives
 Provides:	java-plugin = %{javaver}
 
 Provides:	java-1.6.0-openjdk-plugin = 1.6.0.0-18.b22
-Obsoletes:	java-1.6.0-openjdk-plugin < 1.6.0.0-18.b20
+Obsoletes:	java-1.6.0-openjdk-plugin
 
 Patch0:		icedtea-web-1.0.2-mutex_and_leak.patch
 
@@ -63,7 +70,9 @@ implementations.
 Summary:    API documentation for IcedTea-Web
 Group:      Documentation
 Requires:   jpackage-utils
-BuildArch:  noarch
+%if %mdkversion >= 201010
+BuildArch:	noarch
+%endif
 
 %description javadoc
 This package contains Javadocs for the IcedTea-Web project.
@@ -71,6 +80,12 @@ This package contains Javadocs for the IcedTea-Web project.
 %prep
 %setup -q
 %patch0 -p1
+
+%if %mdkversion < 201000
+# ugly hack to make it work on 2009.0/mes5 (pcpa)
+perl -pi -e 's|AC_CANONICAL_HOST||;' configure.*
+autoreconf -fi
+%endif
 
 %build
 %configure2_5x						\
