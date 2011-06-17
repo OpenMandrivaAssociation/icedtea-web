@@ -1,5 +1,5 @@
 %if %mandriva_branch == Cooker
-%define release		%mkrel 2
+%define release		%mkrel 1
 %else
 %define subrel		1
 %define release		%mkrel 0
@@ -29,7 +29,7 @@
 %endif
 
 Name:		icedtea-web
-Version:	1.0.2
+Version:	1.0.3
 Release:	%{release}
 Summary:	Additional Java components for OpenJDK
 Group:		Networking/WWW
