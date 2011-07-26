@@ -29,7 +29,7 @@
 %endif
 
 Name:		icedtea-web
-Version:	1.0.3
+Version:	1.0.4
 Release:	%{release}
 Summary:	Additional Java components for OpenJDK
 Group:		Networking/WWW
