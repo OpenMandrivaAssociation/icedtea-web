@@ -84,7 +84,7 @@ implementations.
 
 %package javadoc
 Summary:    API documentation for IcedTea-Web
-Group:      Documentation
+Group:      Networking/WWW
 Requires:   jpackage-utils
 %if %mdkversion >= 201010
 BuildArch:	noarch
