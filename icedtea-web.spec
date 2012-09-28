@@ -1,6 +1,6 @@
 # actually, plugin should advertise itself as 1.2pre
 %define custom		.1
-%define snapshot	89eb20442421
+#define snapshot	89eb20442421
 
 %ifarch %{ix86} x86_64
   %define javaver	1.7.0
@@ -30,8 +30,8 @@
 %define binsuffix      .itweb
 
 Name:		icedtea-web
-Version:	1.1.4%{custom}
-Release:	3
+Version:	1.3
+Release:	1
 Summary:	Additional Java components for OpenJDK
 Group:		Networking/WWW
 License:	LGPLv2+ and GPLv2 with exceptions
@@ -98,8 +98,8 @@ This package contains Javadocs for the IcedTea-Web project.
   %setup -q
 %endif
 
-%patch0 -p1
-%patch1 -p1
+#patch0 -p1
+#patch1 -p1
 
 %if !%{defined snapshot}
   %if %mdkversion < 201000
