@@ -1,10 +1,6 @@
-# actually, plugin should advertise itself as 1.2pre
-%define custom		.1
-#define snapshot	89eb20442421
-
 %ifarch %{ix86} x86_64
-  %define javaver	1.7.0
-  %define priority	17000
+  %define javaver	1.6.0
+  %define priority	16000
 %else
   %define javaver	1.6.0
   %define priority	16000
@@ -30,18 +26,14 @@
 %define binsuffix      .itweb
 
 Name:		icedtea-web
-Version:	1.3
-Release:	1
+Version:	1.1.5
+%define subrel 1
+Release:	%mkrel 0
 Summary:	Additional Java components for OpenJDK
 Group:		Networking/WWW
 License:	LGPLv2+ and GPLv2 with exceptions
 URL:		http://icedtea.classpath.org/wiki/IcedTea-Web
-%if !%{defined snapshot}
 Source0:	http://icedtea.classpath.org/download/source/%{name}-%{version}.tar.gz
-%else
-# http://icedtea.classpath.org/hg/icedtea-web/archive/%{snapshot}.tar.gz
-Source0:	icedtea-web-%{snapshot}.tar.gz
-%endif
 
 BuildRequires:	desktop-file-utils
 BuildRequires:	glib2-devel
@@ -71,8 +63,6 @@ Obsoletes:	java-1.6.0-openjdk-plugin
 ExclusiveArch:	x86_64 i586
 
 Patch0:		icedtea-web-1.0.2-mutex_and_leak.patch
-# http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=866
-Patch1:		PR820.patch
 
 %description
 The IcedTea-Web project provides a Java web browser plugin, an implementation
@@ -92,24 +82,9 @@ BuildArch:	noarch
 This package contains Javadocs for the IcedTea-Web project.
 
 %prep
-%if %{defined snapshot}
-  %setup -q -n %{name}-%{snapshot}
-%else
-  %setup -q
-%endif
+%setup -q
 
-#patch0 -p1
-#patch1 -p1
-
-%if !%{defined snapshot}
-  %if %mdkversion < 201000
-    # ugly hack to make it work on 2009.0/mes5 (pcpa)
-    perl -pi -e 's|AC_CANONICAL_HOST||;' configure.*
-    autoreconf -fi
-  %endif
-%else
-    sh autogen.sh
-%endif
+%patch0 -p1
 
 %build
 %configure2_5x						\
@@ -140,7 +115,7 @@ desktop-file-install --vendor ''\
 if [ $1 -gt 1 ]
 then
 update-alternatives --remove %{javaplugin} \
-  %{jre6dir}/lib/%{archinstall}/IcedTeaPlugin.so 2>/dev/null || :	
+  %{jre6dir}/lib/%{archinstall}/IcedTeaPlugin.so 2>/dev/null || :
 fi
 
 %posttrans
@@ -178,3 +153,5 @@ exit 0
 %defattr(-,root,root,-)
 %{_datadir}/javadoc/%{name}
 %doc COPYING
+
+
