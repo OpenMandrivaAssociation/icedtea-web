@@ -1,6 +1,5 @@
 # actually, plugin should advertise itself as 1.2pre
 %define custom		.1
-#define snapshot	89eb20442421
 
 %ifarch %{ix86} x86_64
   %define javaver	1.7.0
@@ -36,16 +35,11 @@ Summary:	Additional Java components for OpenJDK
 Group:		Networking/WWW
 License:	LGPLv2+ and GPLv2 with exceptions
 URL:		http://icedtea.classpath.org/wiki/IcedTea-Web
-%if !%{defined snapshot}
 Source0:	http://icedtea.classpath.org/download/source/%{name}-%{version}.tar.gz
-%else
-# http://icedtea.classpath.org/hg/icedtea-web/archive/%{snapshot}.tar.gz
-Source0:	icedtea-web-%{snapshot}.tar.gz
-%endif
 
 BuildRequires:	desktop-file-utils
-BuildRequires:	glib2-devel
-BuildRequires:	gtk2-devel
+BuildRequires:	pkgconfig(glib-2.0)
+BuildRequires:	pkgconfig(gtk+-2.0)
 
 %ifarch %{ix86} x86_64
 BuildRequires:	java-%{javaver}-openjdk-devel
@@ -53,13 +47,13 @@ BuildRequires:	java-%{javaver}-openjdk-devel
 BuildRequires:	java-%{javaver}-openjdk-devel >= 1.6.0.0-18.b22
 %endif
 
-BuildRequires:	xulrunner-devel
+BuildRequires:	pkgconfig(mozilla-plugin)
 BuildRequires:	zip
-BuildRequires:	zlib-devel
+BuildRequires:	pkgconfig(zlib)
 
 Requires:	java-%{javaver}-openjdk
-Requires(post):   update-alternatives
-Requires(postun): update-alternatives
+Requires(post):	update-alternatives
+Requires(postun):update-alternatives
 
 # Standard JPackage plugin provides.
 Provides:	java-plugin = %{javaver}
@@ -81,11 +75,11 @@ of Java Web Start (originally based on the Netx project) and a settings tool to
 manage deployment settings for the aforementioned plugin and Web Start
 implementations. 
 
-%package javadoc
-Summary:    API documentation for IcedTea-Web
-Group:      Networking/WWW
-Requires:   jpackage-utils
-%if %mdkversion >= 201010
+%package	javadoc
+Summary:	API documentation for IcedTea-Web
+Group:		Networking/WWW
+Requires:	jpackage-utils
+%if %{mdkversion} >= 201010
 BuildArch:	noarch
 %endif
 
@@ -93,45 +87,33 @@ BuildArch:	noarch
 This package contains Javadocs for the IcedTea-Web project.
 
 %prep
-%if %{defined snapshot}
-  %setup -q -n %{name}-%{snapshot}
-%else
-  %setup -q
-%endif
+%setup -q
 
 #patch0 -p1
 #patch1 -p1
 %patch2 -p1 -b .nogtk~
 
-%if !%{defined snapshot}
-  %if %mdkversion < 201000
-    # ugly hack to make it work on 2009.0/mes5 (pcpa)
-    perl -pi -e 's|AC_CANONICAL_HOST||;' configure.*
-    autoreconf -fi
-  %endif
-%else
-    sh autogen.sh
-%endif
+# ugly hack to make it work on 2009.0/mes5 (pcpa)
+sed -e 's|AC_CANONICAL_HOST||;' -i configure.*
+autoreconf -fi
 
 %build
 %configure2_5x						\
-	--with-pkgversion=mandriva-%{release}-%{_arch}	\
+	--with-pkgversion=%{_vendor}-%{release}-%{_arch}	\
 	--docdir=%{_javadocdir}/%{name}			\
 	--with-jdk-home=%{javadir}			\
 	--with-jre-home=%{jredir}			\
-	--libdir=%{_libdir}				\
-	--program-suffix=%{binsuffix}			\
-	--prefix=%{_prefix}
+	--program-suffix=%{binsuffix}
 
-make CXXFLAGS="%{optflags}"
+%make CXXFLAGS="%{optflags}"
 
 %install
 %makeinstall_std
 # Move javaws man page to a more specific name
-mv %{buildroot}/%{_mandir}/man1/javaws.1 %{buildroot}/%{_mandir}/man1/javaws-itweb.1
+mv %{buildroot}%{_mandir}/man1/javaws.1 %{buildroot}%{_mandir}/man1/javaws-itweb.1
 
 # Install desktop files.
-install -d -m 755 %{buildroot}%{_datadir}/{applications,pixmaps}
+install -d -m755 %{buildroot}%{_datadir}/{applications,pixmaps}
 cp javaws.png %{buildroot}%{_datadir}/pixmaps
 desktop-file-install --vendor ''\
   --dir %{buildroot}%{_datadir}/applications javaws.desktop
@@ -167,8 +149,7 @@ fi
 exit 0
 
 %files
-%defattr(-,root,root,-)
-%{_prefix}/bin/*
+%{_bindir}/*
 %{_libdir}/IcedTeaPlugin.so
 %{_datadir}/applications/*
 %{_datadir}/icedtea-web
@@ -177,6 +158,5 @@ exit 0
 %doc NEWS README COPYING
 
 %files javadoc
-%defattr(-,root,root,-)
-%{_datadir}/javadoc/%{name}
+%{_javadocdir}/%{name}
 %doc COPYING
