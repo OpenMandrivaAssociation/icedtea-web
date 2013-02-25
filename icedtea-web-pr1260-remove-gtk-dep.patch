@@ -1,0 +1,162 @@
+# HG changeset patch
+# User Deepak Bhole <dbhole@redhat.com>
+# Date 1358368484 18000
+# Node ID b619cda993601abbd81e713d5c43be7a0d49ac1d
+# Parent  b96993bf10618436a572f678e265348bada6cf8b
+PR1260: IcedTea-Web should not rely on GTK
+
+diff -r b96993bf1061 -r b619cda99360 Makefile.am
+--- a/Makefile.am	Mon Jan 07 11:47:42 2013 -0500
++++ b/Makefile.am	Wed Jan 16 15:34:44 2013 -0500
+@@ -270,7 +270,6 @@
+ 	  -DICEDTEA_WEB_JRE="\"$(SYSTEM_JRE_DIR)\"" \
+ 	  -DPLUGIN_BOOTCLASSPATH=$(PLUGIN_BOOTCLASSPATH) \
+ 	  $(GLIB_CFLAGS) \
+-	  $(GTK_CFLAGS) \
+ 	  $(MOZILLA_CFLAGS) \
+ 	  -fPIC -o $@ -c $<
+ 
+@@ -279,7 +278,6 @@
+ 	$(CXX) $(CXXFLAGS) \
+ 	  $(PLUGIN_OBJECTS) \
+ 	  $(GLIB_LIBS) \
+-	  $(GTK_LIBS) \
+ 	  $(MOZILLA_LIBS)\
+ 	  -shared -o $@
+ 
+diff -r b96993bf1061 -r b619cda99360 acinclude.m4
+--- a/acinclude.m4	Mon Jan 07 11:47:42 2013 -0500
++++ b/acinclude.m4	Wed Jan 16 15:34:44 2013 -0500
+@@ -359,56 +359,15 @@
+ AC_MSG_RESULT(${enable_plugin})
+ ])
+ 
+-dnl ITW_GTK_CHECK_VERSION([gtk version])
+-AC_DEFUN([ITW_GTK_CHECK_VERSION],
+-[
+-  AC_MSG_CHECKING([for GTK$1 version])
+-  GTK_VER=`$PKG_CONFIG --modversion gtk+-$1.0`
+-  AC_MSG_RESULT([$GTK_VER])
+-])
+-
+-dnl ITW_GTK_CHECK([gtk version])
+-AC_DEFUN([ITW_GTK_CHECK],
+-[
+-  case "$1" in
+-    default)
+-      PKG_CHECK_MODULES(GTK, gtk+-3.0,
+-        [ITW_GTK_CHECK_VERSION([3])],
+-        [PKG_CHECK_MODULES(GTK, gtk+-2.0,
+-           [ITW_GTK_CHECK_VERSION([2])],
+-           [AC_MSG_ERROR([GTK $1 not found])]
+-        )]
+-      )
+-      ;;
+-    *)
+-      PKG_CHECK_MODULES(GTK, gtk+-$1.0,
+-        [ITW_GTK_CHECK_VERSION([$1])],
+-        [AC_MSG_ERROR([GTK $1 not found])]
+-      )
+-      ;;
+-  esac
+-])
+-
+ AC_DEFUN_ONCE([IT_CHECK_PLUGIN_DEPENDENCIES],
+ [
+ dnl Check for plugin support headers and libraries.
+ dnl FIXME: use unstable
+ AC_REQUIRE([IT_CHECK_PLUGIN])
+ if test "x${enable_plugin}" = "xyes" ; then
+-  AC_ARG_WITH([gtk],
+-    [AS_HELP_STRING([--with-gtk=[2|3|default]],
+-    [the GTK+ version to use (default: 3)])],
+-    [case "$with_gtk" in
+-       2|3|default) ;;
+-       *) AC_MSG_ERROR([invalid GTK version specified]) ;;
+-     esac],
+-    [with_gtk=default])
+-  ITW_GTK_CHECK([$with_gtk])
+   PKG_CHECK_MODULES(GLIB, glib-2.0)
+   AC_SUBST(GLIB_CFLAGS)
+   AC_SUBST(GLIB_LIBS)
+-  AC_SUBST(GTK_CFLAGS)
+-  AC_SUBST(GTK_LIBS)
+ 
+   PKG_CHECK_MODULES(MOZILLA, npapi-sdk, [
+     AC_CACHE_CHECK([for xulrunner version], [xulrunner_cv_collapsed_version],[
+diff -r b96993bf1061 -r b619cda99360 plugin/icedteanp/IcedTeaJavaRequestProcessor.h
+--- a/plugin/icedteanp/IcedTeaJavaRequestProcessor.h	Mon Jan 07 11:47:42 2013 -0500
++++ b/plugin/icedteanp/IcedTeaJavaRequestProcessor.h	Wed Jan 16 15:34:44 2013 -0500
+@@ -41,6 +41,7 @@
+ 
+ #include <errno.h>
+ #include <stdlib.h>
++#include <unistd.h>
+ #include <vector>
+ 
+ #include "IcedTeaNPPlugin.h"
+diff -r b96993bf1061 -r b619cda99360 plugin/icedteanp/IcedTeaNPPlugin.cc
+--- a/plugin/icedteanp/IcedTeaNPPlugin.cc	Mon Jan 07 11:47:42 2013 -0500
++++ b/plugin/icedteanp/IcedTeaNPPlugin.cc	Wed Jan 16 15:34:44 2013 -0500
+@@ -218,8 +218,6 @@
+ static void plugin_data_new (ITNPPluginData** data);
+ // Retrieve the current document's documentbase.
+ static gchar* plugin_get_documentbase (NPP instance);
+-// Notify the user that the appletviewer is not installed correctly.
+-static void plugin_display_failure_dialog ();
+ // Callback used to monitor input pipe status.
+ static gboolean plugin_in_pipe_callback (GIOChannel* source,
+                                          GIOCondition condition,
+@@ -1127,30 +1125,6 @@
+ }
+ #endif
+ 
+-// This function displays an error message if the appletviewer has not
+-// been installed correctly.
+-static void
+-plugin_display_failure_dialog ()
+-{
+-  GtkWidget* dialog = NULL;
+-
+-  PLUGIN_DEBUG ("plugin_display_failure_dialog\n");
+-
+-  dialog = gtk_message_dialog_new (NULL,
+-                                   GTK_DIALOG_DESTROY_WITH_PARENT,
+-                                   GTK_MESSAGE_ERROR,
+-                                   GTK_BUTTONS_CLOSE,
+-                                   FAILURE_MESSAGE,
+-                                   appletviewer_executable);
+-  gtk_widget_show_all (dialog);
+-  gtk_dialog_run (GTK_DIALOG (dialog));
+-  gtk_widget_destroy (dialog);
+-
+-  PLUGIN_DEBUG ("plugin_display_failure_dialog return\n");
+-}
+-
+-
+-
+ // plugin_in_pipe_callback is called when data is available on the
+ // input pipe, or when the appletviewer crashes or is killed.  It may
+ // be called after data has been destroyed in which case it simply
+@@ -2297,7 +2271,7 @@
+   np_error = plugin_test_appletviewer ();
+   if (np_error != NPERR_NO_ERROR)
+     {
+-      plugin_display_failure_dialog ();
++      fprintf(stderr, "Unable to find java executable %s\n", appletviewer_executable);
+       goto cleanup_appletviewer_executable;
+     }
+   g_free (filename);
+diff -r b96993bf1061 -r b619cda99360 plugin/icedteanp/IcedTeaNPPlugin.h
+--- a/plugin/icedteanp/IcedTeaNPPlugin.h	Mon Jan 07 11:47:42 2013 -0500
++++ b/plugin/icedteanp/IcedTeaNPPlugin.h	Wed Jan 16 15:34:44 2013 -0500
+@@ -51,9 +51,6 @@
+ #include <glib.h>
+ #include <glib/gstdio.h>
+ 
+-// GTK includes.
+-#include <gtk/gtk.h>
+-
+ #include "IcedTeaPluginUtils.h"
+ #include "IcedTeaPluginRequestProcessor.h"
+ 

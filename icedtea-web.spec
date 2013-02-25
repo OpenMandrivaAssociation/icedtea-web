@@ -31,7 +31,7 @@
 
 Name:		icedtea-web
 Version:	1.3
-Release:	1
+Release:	2
 Summary:	Additional Java components for OpenJDK
 Group:		Networking/WWW
 License:	LGPLv2+ and GPLv2 with exceptions
@@ -73,6 +73,7 @@ ExclusiveArch:	x86_64 i586
 Patch0:		icedtea-web-1.0.2-mutex_and_leak.patch
 # http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=866
 Patch1:		PR820.patch
+Patch2:		icedtea-web-pr1260-remove-gtk-dep.patch
 
 %description
 The IcedTea-Web project provides a Java web browser plugin, an implementation
@@ -100,6 +101,7 @@ This package contains Javadocs for the IcedTea-Web project.
 
 #patch0 -p1
 #patch1 -p1
+%patch2 -p1 -b .nogtk~
 
 %if !%{defined snapshot}
   %if %mdkversion < 201000
