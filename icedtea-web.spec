@@ -28,46 +28,40 @@
 
 %define binsuffix      .itweb
 
+Summary:	Additional Java components for OpenJDK
 Name:		icedtea-web
 Version:	1.3
 Release:	2
-Summary:	Additional Java components for OpenJDK
 Group:		Networking/WWW
 License:	LGPLv2+ and GPLv2 with exceptions
-URL:		http://icedtea.classpath.org/wiki/IcedTea-Web
+Url:		http://icedtea.classpath.org/wiki/IcedTea-Web
 Source0:	http://icedtea.classpath.org/download/source/%{name}-%{version}.tar.gz
+Patch0:		icedtea-web-1.0.2-mutex_and_leak.patch
+# http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=866
+Patch1:		PR820.patch
+Patch2:		icedtea-web-pr1260-remove-gtk-dep.patch
+# IcedTea is only built on these archs for now
+ExclusiveArch:	x86_64 i586
 
 BuildRequires:	desktop-file-utils
+BuildRequires:	zip
 BuildRequires:	pkgconfig(glib-2.0)
 BuildRequires:	pkgconfig(gtk+-2.0)
-
 %ifarch %{ix86} x86_64
 BuildRequires:	java-%{javaver}-openjdk-devel
 %else
 BuildRequires:	java-%{javaver}-openjdk-devel >= 1.6.0.0-18.b22
 %endif
-
 BuildRequires:	pkgconfig(mozilla-plugin)
-BuildRequires:	zip
 BuildRequires:	pkgconfig(zlib)
 
 Requires:	java-%{javaver}-openjdk
-Requires(post):	update-alternatives
-Requires(postun):update-alternatives
+Requires(post,postun):	update-alternatives
 
 # Standard JPackage plugin provides.
 Provides:	java-plugin = %{javaver}
-
 Provides:	java-1.6.0-openjdk-plugin = 1.6.0.0-18.b22
 Obsoletes:	java-1.6.0-openjdk-plugin
-
-# IcedTea is only built on these archs for now
-ExclusiveArch:	x86_64 i586
-
-Patch0:		icedtea-web-1.0.2-mutex_and_leak.patch
-# http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=866
-Patch1:		PR820.patch
-Patch2:		icedtea-web-pr1260-remove-gtk-dep.patch
 
 %description
 The IcedTea-Web project provides a Java web browser plugin, an implementation
@@ -79,9 +73,7 @@ implementations.
 Summary:	API documentation for IcedTea-Web
 Group:		Networking/WWW
 Requires:	jpackage-utils
-%if %{mdkversion} >= 201010
 BuildArch:	noarch
-%endif
 
 %description javadoc
 This package contains Javadocs for the IcedTea-Web project.
@@ -98,11 +90,11 @@ sed -e 's|AC_CANONICAL_HOST||;' -i configure.*
 autoreconf -fi
 
 %build
-%configure2_5x						\
-	--with-pkgversion=%{_vendor}-%{release}-%{_arch}	\
-	--docdir=%{_javadocdir}/%{name}			\
-	--with-jdk-home=%{javadir}			\
-	--with-jre-home=%{jredir}			\
+%configure2_5x \
+	--with-pkgversion=%{_vendor}-%{release}-%{_arch} \
+	--docdir=%{_javadocdir}/%{name} \
+	--with-jdk-home=%{javadir} \
+	--with-jre-home=%{jredir} \
 	--program-suffix=%{binsuffix}
 
 %make CXXFLAGS="%{optflags}"
@@ -116,34 +108,33 @@ mv %{buildroot}%{_mandir}/man1/javaws.1 %{buildroot}%{_mandir}/man1/javaws-itweb
 install -d -m755 %{buildroot}%{_datadir}/{applications,pixmaps}
 cp javaws.png %{buildroot}%{_datadir}/pixmaps
 desktop-file-install --vendor ''\
-  --dir %{buildroot}%{_datadir}/applications javaws.desktop
+	--dir %{buildroot}%{_datadir}/applications javaws.desktop
 desktop-file-install --vendor ''\
-  --dir %{buildroot}%{_datadir}/applications itweb-settings.desktop
+	--dir %{buildroot}%{_datadir}/applications itweb-settings.desktop
 
 %post
 if [ $1 -gt 1 ]
 then
 update-alternatives --remove %{javaplugin} \
-  %{jre6dir}/lib/%{archinstall}/IcedTeaPlugin.so 2>/dev/null || :	
+	%{jre6dir}/lib/%{archinstall}/IcedTeaPlugin.so 2>/dev/null || :	
 fi
 
 %posttrans
 update-desktop-database &> /dev/null || :
 update-alternatives \
-  --install %{_libdir}/mozilla/plugins/libjavaplugin.so %{javaplugin} \
-  %{_libdir}/IcedTeaPlugin.so %{priority} \
-  --slave %{_bindir}/javaws javaws %{_prefix}/bin/javaws%{binsuffix} \
-  --slave %{_mandir}/man1/javaws.1.gz javaws.1.gz \
-  %{_mandir}/man1/javaws-itweb.1.gz
+	--install %{_libdir}/mozilla/plugins/libjavaplugin.so %{javaplugin} \
+	%{_libdir}/IcedTeaPlugin.so %{priority} \
+	--slave %{_bindir}/javaws javaws %{_prefix}/bin/javaws%{binsuffix} \
+	--slave %{_mandir}/man1/javaws.1.gz javaws.1.gz \
+	%{_mandir}/man1/javaws-itweb.1.gz
 
 exit 0
 
 %postun
 update-desktop-database &> /dev/null || :
-if [ $1 -eq 0 ]
-then
-  update-alternatives --remove %{javaplugin} \
-    %{_libdir}/IcedTeaPlugin.so
+if [ $1 -eq 0 ]; then
+	update-alternatives --remove %{javaplugin} \
+		%{_libdir}/IcedTeaPlugin.so
 fi
 
 exit 0
@@ -153,10 +144,11 @@ exit 0
 %{_libdir}/IcedTeaPlugin.so
 %{_datadir}/applications/*
 %{_datadir}/icedtea-web
-%{_datadir}/man/man1/*
 %{_datadir}/pixmaps/*
+%{_mandir}/man1/*
 %doc NEWS README COPYING
 
 %files javadoc
 %{_javadocdir}/%{name}
 %doc COPYING
+
