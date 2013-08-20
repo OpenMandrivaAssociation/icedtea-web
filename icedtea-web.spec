@@ -36,6 +36,9 @@ Group:		Networking/WWW
 License:	LGPLv2+ and GPLv2 with exceptions
 Url:		http://icedtea.classpath.org/wiki/IcedTea-Web
 Source0:	http://icedtea.classpath.org/download/source/%{name}-%{version}.tar.gz
+# These patches are upstream, but not in a release branch
+# http://icedtea.classpath.org/hg/icedtea-web/rev/2469bedc6d63
+Patch1:		b25-appContextFix.patch
 
 # IcedTea is only built on these archs for now
 ExclusiveArch:	x86_64 i586
@@ -78,6 +81,7 @@ This package contains Javadocs for the IcedTea-Web project.
 %prep
 %setup -q
 
+%patch1 -p1
 
 # ugly hack to make it work on 2009.0/mes5 (pcpa)
 sed -e 's|AC_CANONICAL_HOST||;' -i configure.*
