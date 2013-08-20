@@ -30,16 +30,13 @@
 
 Summary:	Additional Java components for OpenJDK
 Name:		icedtea-web
-Version:	1.3
-Release:	2
+Version:	1.4
+Release:	1
 Group:		Networking/WWW
 License:	LGPLv2+ and GPLv2 with exceptions
 Url:		http://icedtea.classpath.org/wiki/IcedTea-Web
 Source0:	http://icedtea.classpath.org/download/source/%{name}-%{version}.tar.gz
-Patch0:		icedtea-web-1.0.2-mutex_and_leak.patch
-# http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=866
-Patch1:		PR820.patch
-Patch2:		icedtea-web-pr1260-remove-gtk-dep.patch
+
 # IcedTea is only built on these archs for now
 ExclusiveArch:	x86_64 i586
 
@@ -81,9 +78,6 @@ This package contains Javadocs for the IcedTea-Web project.
 %prep
 %setup -q
 
-#patch0 -p1
-#patch1 -p1
-%patch2 -p1 -b .nogtk~
 
 # ugly hack to make it work on 2009.0/mes5 (pcpa)
 sed -e 's|AC_CANONICAL_HOST||;' -i configure.*
