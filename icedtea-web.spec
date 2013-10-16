@@ -31,7 +31,7 @@
 Summary:	Additional Java components for OpenJDK
 Name:		icedtea-web
 Version:	1.3
-Release:	2
+Release:	3
 Group:		Networking/WWW
 License:	LGPLv2+ and GPLv2 with exceptions
 Url:		http://icedtea.classpath.org/wiki/IcedTea-Web
