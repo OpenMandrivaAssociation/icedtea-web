@@ -69,7 +69,7 @@ Obsoletes:	java-1.6.0-openjdk-plugin
 The IcedTea-Web project provides a Java web browser plugin, an implementation
 of Java Web Start (originally based on the Netx project) and a settings tool to
 manage deployment settings for the aforementioned plugin and Web Start
-implementations. 
+implementations.
 
 %package	javadoc
 Summary:	API documentation for IcedTea-Web
