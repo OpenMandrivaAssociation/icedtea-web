@@ -16,22 +16,19 @@
   %define archinstall	amd64
 %endif
 
+%define javadir	%{_jvmdir}/java-openjdk
+%define jredir	%{_jvmdir}/jre-openjdk
+%define javaplugin	libjavaplugin.so
 %ifarch x86_64
-  %define javadir	%{_jvmdir}/java-%{javaver}-openjdk.%{_arch}
-  %define jredir	%{_jvmdir}/jre-%{javaver}-openjdk.%{_arch}
   %define javaplugin	libjavaplugin.so.%{_arch}
-%else
-  %define javadir	%{_jvmdir}/java-%{javaver}-openjdk
-  %define jredir	%{_jvmdir}/jre-%{javaver}-openjdk
-  %define javaplugin	libjavaplugin.so
 %endif
 
 %define binsuffix      .itweb
 
 Summary:	Additional Java components for OpenJDK
 Name:		icedtea-web
-Version:	1.4.1
-Release:	1.1
+Version:	1.5
+Release:	1
 Group:		Networking/WWW
 License:	LGPLv2+ and GPLv2 with exceptions
 Url:		http://icedtea.classpath.org/wiki/IcedTea-Web
@@ -68,7 +65,7 @@ implementations.
 
 %package	javadoc
 Summary:	API documentation for IcedTea-Web
-Group:		Networking/WWW
+
 Requires:	jpackage-utils
 BuildArch:	noarch
 
@@ -83,7 +80,7 @@ sed -e 's|AC_CANONICAL_HOST||;' -i configure.*
 autoreconf -fi
 
 %build
-%configure2_5x \
+%configure \
 	--with-pkgversion=%{_vendor}-%{release}-%{_arch} \
 	--docdir=%{_javadocdir}/%{name} \
 	--with-jdk-home=%{javadir} \
