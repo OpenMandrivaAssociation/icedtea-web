@@ -30,17 +30,12 @@
 
 Summary:	Additional Java components for OpenJDK
 Name:		icedtea-web
-Version:	1.4
-Release:	1
+Version:	1.4.1
+Release:	1.1
 Group:		Networking/WWW
 License:	LGPLv2+ and GPLv2 with exceptions
 Url:		http://icedtea.classpath.org/wiki/IcedTea-Web
 Source0:	http://icedtea.classpath.org/download/source/%{name}-%{version}.tar.gz
-# These patches are upstream, but not in a release branch
-# http://icedtea.classpath.org/hg/icedtea-web/rev/2469bedc6d63
-Patch1:		b25-appContextFix.patch
-# http://icedtea.classpath.org/hg/icedtea-web/rev/6904f82aa501
-Patch2:		rhino-pac-permissions.patch
 
 # IcedTea is only built on these archs for now
 ExclusiveArch:	x86_64 i586
@@ -82,9 +77,6 @@ This package contains Javadocs for the IcedTea-Web project.
 
 %prep
 %setup -q
-
-%patch1 -p1
-%patch2 -p1
 
 # ugly hack to make it work on 2009.0/mes5 (pcpa)
 sed -e 's|AC_CANONICAL_HOST||;' -i configure.*
