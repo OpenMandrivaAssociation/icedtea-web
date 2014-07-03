@@ -1,9 +1,11 @@
-# actually, plugin should advertise itself as 1.2pre
-%define custom		.1
-
 %ifarch %{ix86} x86_64
+%if "%{distepoch}" >= "2015.0"
+  %define javaver	1.8.0
+  %define priority	18000
+%else
   %define javaver	1.7.0
   %define priority	17000
+%endif
 %else
   %define javaver	1.6.0
   %define priority	16000
@@ -28,11 +30,21 @@
 Summary:	Additional Java components for OpenJDK
 Name:		icedtea-web
 Version:	1.5
-Release:	1
+Release:	2
 Group:		Networking/WWW
 License:	LGPLv2+ and GPLv2 with exceptions
 Url:		http://icedtea.classpath.org/wiki/IcedTea-Web
 Source0:	http://icedtea.classpath.org/download/source/%{name}-%{version}.tar.gz
+
+Patch0:		DElocalizationforIcedTea-Web1.5-0001.patch
+
+# For OpenJDK8 compatiblity
+# http://icedtea.classpath.org/hg/icedtea-web/rev/e3981eb10285
+Patch1:		make-check-openjdk8.patch
+
+# For OpenJDK 8 compatibility
+# http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2014-June/028236.html
+Patch2:		urlpermission.patch
 
 # IcedTea is only built on these archs for now
 ExclusiveArch:	x86_64 i586
@@ -74,6 +86,11 @@ This package contains Javadocs for the IcedTea-Web project.
 
 %prep
 %setup -q
+%patch0 -p1
+%if "%{javaver}" == "1.8.0"
+%patch1 -p1
+%patch2 -p1
+%endif
 
 # ugly hack to make it work on 2009.0/mes5 (pcpa)
 sed -e 's|AC_CANONICAL_HOST||;' -i configure.*

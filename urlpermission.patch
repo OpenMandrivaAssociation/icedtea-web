@@ -1,0 +1,45 @@
+diff --git a/netx/net/sourceforge/jnlp/SecurityDesc.java b/netx/net/sourceforge/jnlp/SecurityDesc.java
+--- a/netx/net/sourceforge/jnlp/SecurityDesc.java
++++ b/netx/net/sourceforge/jnlp/SecurityDesc.java
+@@ -16,11 +16,20 @@
+ 
+ package net.sourceforge.jnlp;
+ 
+-import java.io.*;
+-import java.net.*;
+-import java.util.*;
+-import java.security.*;
+ import java.awt.AWTPermission;
++import java.io.FilePermission;
++import java.net.SocketPermission;
++import java.net.URI;
++import java.net.URISyntaxException;
++import java.net.URLPermission;
++import java.security.AllPermission;
++import java.security.CodeSource;
++import java.security.Permission;
++import java.security.PermissionCollection;
++import java.security.Permissions;
++import java.security.Policy;
++import java.security.URIParameter;
++import java.util.PropertyPermission;
+ 
+ import net.sourceforge.jnlp.config.DeploymentConfiguration;
+ import net.sourceforge.jnlp.runtime.JNLPRuntime;
+@@ -345,6 +354,16 @@ public class SecurityDesc {
+             permissions.add(new SocketPermission(downloadHost,
+                                                  "connect, accept"));
+ 
++        try {
++            final String codebase = file.getCodeBase().toURI().toString();
++            final String urlPermUriString = codebase + (codebase.endsWith("/") ? "-" : "/-");
++            // Allow applets all HTTP methods (ex POST, GET) with any request headers
++            // on resources anywhere recursively in or below the applet codebase
++            permissions.add(new URLPermission(urlPermUriString));
++        } catch (final URISyntaxException e) {
++            OutputController.getLogger().log(e);
++        }
++
+         return permissions;
+     }
+     
