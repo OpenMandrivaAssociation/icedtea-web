@@ -29,7 +29,7 @@
 
 Summary:	Additional Java components for OpenJDK
 Name:		icedtea-web
-Version:	1.5.2
+Version:	1.6
 Release:	1
 Group:		Networking/WWW
 License:	LGPLv2+ and GPLv2 with exceptions

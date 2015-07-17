@@ -1,4 +1,5 @@
 removed_sources:
+  icedtea-web-1.5.2.tar.gz: 45eb9ef057cc5239cd85d7fdfc6394de86ee7e6b
   icedtea-web-1.5.tar.gz: 9a1cf5337e34e487ff0b089cbe0c4c4d60ff9e16
 sources:
-  icedtea-web-1.5.2.tar.gz: 45eb9ef057cc5239cd85d7fdfc6394de86ee7e6b
+  icedtea-web-1.6.tar.gz: 5bf1ec246a4537994f7030667e16c8ae803cc357
