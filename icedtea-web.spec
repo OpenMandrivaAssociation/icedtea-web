@@ -139,6 +139,7 @@ exit 0
 %{_datadir}/icedtea-web
 %{_datadir}/pixmaps/*
 %{_mandir}/man1/*
+%{_mandir}/*/man1/*
 %doc NEWS README COPYING
 
 %files javadoc
