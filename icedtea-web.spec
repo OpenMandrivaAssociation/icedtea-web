@@ -33,7 +33,7 @@ Version:	1.6.2
 Release:	2
 Group:		Networking/WWW
 License:	LGPLv2+ and GPLv2 with exceptions
-Url:		http://icedtea.classpath.org/wiki/IcedTea-Web
+Url:		https://icedtea.classpath.org/wiki/IcedTea-Web
 Source0:	http://icedtea.classpath.org/download/source/%{name}-%{version}.tar.gz
 
 # IcedTea is only built on these archs for now
