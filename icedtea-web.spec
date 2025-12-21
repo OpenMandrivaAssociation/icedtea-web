@@ -39,6 +39,11 @@ Source0:	http://icedtea.classpath.org/download/source/%{name}-%{version}.tar.gz
 # IcedTea is only built on these archs for now
 ExclusiveArch:	x86_64 i586
 
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool-base
+BuildRequires:	slibtool
+BuildRequires:	make
 BuildRequires:	desktop-file-utils
 BuildRequires:	zip
 BuildRequires:	pkgconfig(glib-2.0)
